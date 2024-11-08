@@ -1,0 +1,54 @@
+name: party-finder
+version: "2"
+services:
+  db:
+    env_file: ./.env
+    image: postgres:latest
+    hostname: party-finder-db
+    networks:
+      - backend
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 1m
+      timeout: 30s
+      retries: 5
+      start_interval: 5s
+      start_period: 30s
+  migrator:
+    env_file: ./.env
+    environment:
+      - NODE_ENV=production
+    build:
+      context: .
+      dockerfile: api.Dockerfile
+      target: migrator
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - backend
+  api:
+    restart: on-failure
+    env_file: ./.env
+    environment:
+      - NODE_ENV=production
+    build:
+      context: .
+      dockerfile: api.Dockerfile
+    networks:
+      - backend
+    depends_on:
+      migrator:
+        condition: service_completed_successfully
+      db:
+        condition: service_healthy
+    ports:
+      - ${API_PORT}:3000
+
+volumes:
+  db-data:
+
+networks:
+  backend:
