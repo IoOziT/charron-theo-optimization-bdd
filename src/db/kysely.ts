@@ -1,3 +1,5 @@
+import type { Database } from "../types/kysely/database"
+
 import { CamelCasePlugin, Kysely, PostgresDialect } from "kysely"
 import pg from "pg"
 
@@ -13,7 +15,7 @@ export const pool = new pg.Pool({
 	host,
 })
 
-export const kysely = new Kysely({
+export const kysely = new Kysely<Database>({
 	dialect: new PostgresDialect({
 		pool,
 	}),

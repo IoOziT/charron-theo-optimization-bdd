@@ -1,4 +1,10 @@
-import type { ColumnType, Insertable, Selectable, Updateable } from "kysely"
+import type {
+	ColumnType,
+	Expression,
+	Insertable,
+	Selectable,
+	Updateable,
+} from "kysely"
 
 export type Immutable<T> = ColumnType<T, T, never>
 
@@ -21,3 +27,5 @@ export type PolymorphicViewDefinition<
 	Operation extends keyof ViewDefinitions<View> = "none",
 	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 > = View extends any ? ViewDefinitions<View>[Operation] : never
+
+export type ResolvableExpression<T> = Expression<T> | T
